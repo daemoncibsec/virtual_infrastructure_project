@@ -3,12 +3,13 @@
   roles:
    - role: commons
 
-- hosts: servidores_web
-  become: true
-  roles:
-   - role: apache2
-
 - hosts: servidores_bd
   become: true
   roles:
    - role: mariadb
+
+- name: Configurar PHP-FPM y Apache
+  hosts: servidores_web
+  become: yes
+  roles:
+    - apache2_php-fpm
