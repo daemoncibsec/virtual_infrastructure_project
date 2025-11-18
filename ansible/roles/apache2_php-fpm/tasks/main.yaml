@@ -1,0 +1,100 @@
+- name: Instalar paquetes necesarios para LAMP (Apache, PHP)
+  apt:
+    name:
+      - apache2
+      - php
+      - php8.4-fpm
+      - libapache2-mod-fcgid
+      - php-mysql
+      - php-mbstring
+      - git
+    state: present
+    update_cache: yes
+
+- name: Activar modulos de apache2
+  community.general.apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items: 
+    - "{{ mods_enabled }}"
+  notify: restart apache2
+
+- name: Configuración de virtualhost
+  template: 
+    src: etc/apache2/vhost.j2
+    dest: /etc/apache2/sites-available/{{item["name"]}}.conf
+    owner: root
+    group: root
+  with_items:
+    - "{{virtualhosts}}"
+
+- name: Crear DocumentRoot si no existe
+  ansible.builtin.file:
+    path: /{{item["datos"]["documentroot"]}}
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  with_items:
+    - "{{virtualhosts}}"
+
+- name: Habilitar mod_proxy_fcgi y mod_setenvif
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - proxy_fcgi
+    - setenvif
+
+- name: Configurar Apache para usar PHP-FPM
+  blockinfile:
+    path: "/etc/apache2/sites-available/000-default.conf"
+    block: |
+      <FilesMatch \.php$>
+          SetHandler "proxy:unix:/run/php/php8.4-fpm.sock|fcgi://localhost"
+      </FilesMatch>
+  notify:
+    - Restart apache2
+
+- name: Configurar PHP-FPM para usar el socket Unix
+  lineinfile:
+    path: "/etc/php/8.4/fpm/pool.d/www.conf"
+    regexp: '^listen ='
+    line: 'listen = /run/php/php8.4-fpm.sock'
+  notify:
+    - Restart php-fpm
+
+- name: Asegurarse de que PHP-FPM y Apache están corriendo
+  service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - php8.4-fpm
+    - apache2
+
+- name: Activación de los VirtualHost
+  file:
+    src: /etc/apache2/sites-available/{{item["name"]}}.conf
+    dest: /etc/apache2/sites-enabled/{{item["name"]}}.conf
+    state: link
+  with_items:
+    - "{{virtualhosts}}"
+  notify: restart apache2
+
+
+- name: Copiar aplicación Guestbook
+  ansible.builtin.copy:
+    src: app/
+    dest: "/{{ base_web_path }}/"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    directory_mode: '0755'
+  
+- name: Crear fichero de configuración config.php dentro de la aplicación
+  ansible.builtin.template:
+    src: config.php.j2
+    dest: "/{{ base_web_path }}/config.php"
+    owner: www-data
+    group: www-data
+    
