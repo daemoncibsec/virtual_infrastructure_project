@@ -8,8 +8,13 @@
   roles:
    - role: mariadb
 
-- name: Configurar PHP-FPM y Apache
-  hosts: servidores_web
+#- name: Configurar Apache2 y PHP-FPM
+#  hosts: servidores_web
+#  become: yes
+#  roles:
+#    - apache2_php-fpm
+
+- hosts: servidores_web
   become: yes
   roles:
     - apache2_php-fpm

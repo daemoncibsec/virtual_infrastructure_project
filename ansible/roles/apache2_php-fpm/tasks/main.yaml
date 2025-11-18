@@ -54,7 +54,7 @@
           SetHandler "proxy:unix:/run/php/php8.4-fpm.sock|fcgi://localhost"
       </FilesMatch>
   notify:
-    - Restart apache2
+    - restart apache2
 
 - name: Configurar PHP-FPM para usar el socket Unix
   lineinfile:
