@@ -14,7 +14,8 @@
 #  roles:
 #    - apache2_php-fpm
 
+# Configurar NGINX y PHP-FPM
 - hosts: servidores_web
   become: yes
   roles:
-    - apache2_php-fpm
+    - nginx_php-fpm

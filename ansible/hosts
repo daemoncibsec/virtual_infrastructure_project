@@ -3,7 +3,7 @@ all:
     servidores_web:
       hosts:
         apache2:
-          ansible_host: 192.168.200.90
+          ansible_host: 192.168.200.50
           ansible_user: debian
           ansible_ssh_private_key_file: ~/.ssh/id_rsa
           
@@ -11,6 +11,6 @@ all:
     servidores_bd:
       hosts:
         mariadb:
-          ansible_host: 192.168.200.254
+          ansible_host: 192.168.200.131
           ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/id_rsa
