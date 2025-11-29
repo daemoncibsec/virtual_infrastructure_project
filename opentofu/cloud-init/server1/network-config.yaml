@@ -9,5 +9,5 @@ network:
     ens5: 
       dhcp4: false
       addresses: ["10.0.0.1/24"]
-
-      
+    ens6: 
+      dhcp4: true

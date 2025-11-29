@@ -34,6 +34,14 @@ locals {
       bridge    = "br-datos"
       autostart = true
     }
+
+    red-fisica = {
+      name      = "red-fisica"
+      mode      = "bridge"
+      bridge    = "br0"
+      autostart = true
+      dhcp	= true
+    }
   }
 
   ##############################################
@@ -50,7 +58,8 @@ locals {
       networks = [
         { network_name = "red-externa", wait_for_lease = true },
         { network_name = "red-conf" },
-        { network_name = "red-datos" }
+        { network_name = "red-datos" },
+        { network_name = "red-fisica" },
       ]
 
       user_data      = "${path.module}/cloud-init/server1/user-data.yaml"
@@ -66,7 +75,7 @@ locals {
       networks = [
         { network_name = "red-externa", wait_for_lease = true },
         { network_name = "red-conf" },
-        { network_name = "red-datos" }
+        { network_name = "red-datos"}
       ]
 
       user_data      = "${path.module}/cloud-init/server2/user-data.yaml"
