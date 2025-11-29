@@ -6,7 +6,8 @@
 - hosts: servidores_bd
   become: true
   roles:
-   - role: mariadb
+   - mariadb
+   - wordpress_bd
 
 #- name: Configurar Apache2 y PHP-FPM
 #  hosts: servidores_web
@@ -14,8 +15,8 @@
 #  roles:
 #    - apache2_php-fpm
 
-# Configurar NGINX y PHP-FPM
 - hosts: servidores_web
   become: yes
   roles:
     - nginx_php-fpm
+    - instalar_cms
